@@ -30,7 +30,7 @@ df_weekly_mileage.write.format("delta").mode("overwrite").saveAsTable("gold_week
 # COMMAND ----------
 # 2. Time in HR Zones (Estimates using averages)
 # ---------------------------
-# Since we only receive the `heart_rate_avg` per run directly on the root API endpoint 
+# Since we only receive the `hr_avg` per run directly on the root API endpoint 
 # (unless using extended arrays endpoint), we categorize the entire run into a dominant zone.
 # E.g.
 # Zone 1: < 135
@@ -41,10 +41,10 @@ df_weekly_mileage.write.format("delta").mode("overwrite").saveAsTable("gold_week
 
 df_hr_zones = df_silver.withColumn(
     "dominant_hr_zone",
-    when(col("heart_rate_avg") < 135, "Zone 1 (Easy)")
-    .when(col("heart_rate_avg") <= 150, "Zone 2 (Aerobic)")
-    .when(col("heart_rate_avg") <= 165, "Zone 3 (Tempo)")
-    .when(col("heart_rate_avg") <= 175, "Zone 4 (Threshold)")
+    when(col("hr_avg") < 135, "Zone 1 (Easy)")
+    .when(col("hr_avg") <= 150, "Zone 2 (Aerobic)")
+    .when(col("hr_avg") <= 165, "Zone 3 (Tempo)")
+    .when(col("hr_avg") <= 175, "Zone 4 (Threshold)")
     .otherwise("Zone 5 (Anaerobic)")
 )
 
