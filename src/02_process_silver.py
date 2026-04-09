@@ -13,15 +13,14 @@ SILVER_TABLE_NAME = "runalyze_silver"
 
 # COMMAND ----------
 # 1. Define the Expected Schema of the JSON payload
-# Note: For production, you may want to parse a more extensive schema depending on what Runalyze returns.
 runalyze_schema = StructType([
     StructField("id", IntegerType(), True),
-    StructField("sportid", IntegerType(), True),         # Might be used to filter for runs
+    StructField("sport_id", IntegerType(), True),         # Might be used to filter for runs
     StructField("distance", DoubleType(), True),         # Usually returned in km
     StructField("duration", DoubleType(), True),         # Usually returned in seconds
-    StructField("time", StringType(), True),             # UNIX timestamp or ISO string
-    StructField("heart_rate_avg", IntegerType(), True),
-    StructField("heart_rate_max", IntegerType(), True),
+    StructField("date_time", StringType(), True),             # UNIX timestamp or ISO string
+    StructField("hr_avg", IntegerType(), True),
+    StructField("hr_max", IntegerType(), True),
     StructField("title", StringType(), True)
 ])
 
@@ -37,11 +36,11 @@ df_silver = df_bronze.withColumn("parsed", from_json(col("raw_json"), runalyze_s
 
 # Cast numerical data and format dates
 # Assuming Runalyze "time" is a unix UTC timestamp, we cast it:
-df_silver = df_silver.withColumn("activity_timestamp", to_timestamp(col("time"))) \
-                     .drop("time")
+df_silver = df_silver.withColumn("activity_timestamp", to_timestamp(col("date_time"))) \
+                     .drop("date_time")
 
-# Only keep Running activities (often sportid == 1, check your Runalyze 'sports' endpoint for exact ID)
-df_silver = df_silver.filter(col("sportid") == 1)
+# Only keep Running activities (often sportid == 809212 for Runalyze Running)
+df_silver = df_silver.filter(col("sport_id") == 809212)
 
 # Handle Deduplication (since Bronze just blindly APPENDS during execution)
 df_silver = df_silver.dropDuplicates(["id"])
