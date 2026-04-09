@@ -5,7 +5,7 @@
 # MAGIC This notebook parses the raw JSON payload from the Bronze table, flattens the columns, casts correct datatypes, deduplicates runs, and writes directly to the Silver delta table.
 
 # COMMAND ----------
-from pyspark.sql.functions import col, from_json, to_timestamp, dropDuplicates
+from pyspark.sql.functions import col, from_json, to_timestamp
 from pyspark.sql.types import StructType, StructField, StringType, DoubleType, IntegerType
 
 BRONZE_TABLE_NAME = "runalyze_bronze"
