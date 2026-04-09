@@ -5,7 +5,7 @@
 # MAGIC This notebook calculates aggregate metrics ready for Dashboarding.
 
 # COMMAND ----------
-from pyspark.sql.functions import col, sum, avg, count, when, date_trunc
+from pyspark.sql.functions import col, sum, avg, count, when, date_trunc, floor, format_string
 
 SILVER_TABLE_NAME = "runalyze_silver"
 
@@ -63,11 +63,20 @@ df_weekly_pace = df_with_week.groupBy("run_week") \
                              .agg(sum("duration").alias("total_duration_sec"),
                                   sum("distance").alias("total_distance_km"))
 
-# Calculate Weighted average pace per week in minutes/km
+# Calculate Weighted average pace per week in minutes/km and total seconds/km
 df_weekly_pace = df_weekly_pace.withColumn(
     "avg_pace_minutes_per_km", 
     (col("total_duration_sec") / 60) / col("total_distance_km")
-).select("run_week", "avg_pace_minutes_per_km") \
+).withColumn(
+    "pace_seconds_per_km",
+    col("total_duration_sec") / col("total_distance_km")
+).withColumn(
+    "friendly_pace",
+    format_string("%d:%02d min/km", 
+                  floor(col("pace_seconds_per_km") / 60).cast("int"), 
+                  floor(col("pace_seconds_per_km") % 60).cast("int"))
+).drop("pace_seconds_per_km") \
+ .select("run_week", "avg_pace_minutes_per_km", "friendly_pace") \
  .orderBy("run_week")
 
 df_weekly_pace.write.format("delta").mode("overwrite").saveAsTable("gold_weekly_pace")
