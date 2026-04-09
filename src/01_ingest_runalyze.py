@@ -33,14 +33,28 @@ except Exception:
 # COMMAND ----------
 # 3. Call the API
 headers = {
-    "Token": API_TOKEN,
+    "token": API_TOKEN,
     "Content-Type": "application/json"
 }
 
-# The Runalyze API supports pagination or timespan filtering. 
-# For demonstration, we simply call the main endpoint.
-response = requests.get(BASE_URL, headers=headers)
-response.raise_for_status()
+print(f"Diagnostics: Token string length loaded is {len(API_TOKEN)}")
+
+try:
+    ping_resp = requests.get("https://runalyze.com/api/v1/ping", headers=headers)
+    ping_resp.raise_for_status()
+    print("Diagnostics: Primary Authentication (Ping Endpoint) SUCCESS!")
+except Exception as e:
+    raise Exception(f"Diagnostics: primary auth failed! Your token is genuinely invalid, lacks Personal API privileges, or is corrupted. Error: {e}")
+
+# If ping succeeds but we fail fetching activities, it's an endpoint or permission scope issue!
+try:
+    response = requests.get(BASE_URL, headers=headers)
+    response.raise_for_status()
+except Exception as e:
+    print(f"Diagnostics: Fetching {BASE_URL} failed with {e}")
+    print("Since your token successfully passed the /ping check, this 401/403/404 error means your Token was NOT granted 'Read Activities' permissions when you created it in Runalyze, OR you need a Premium/Supporter account for this specific endpoint.")
+    raise
+
 activities = response.json()
 
 if not activities:
