@@ -18,7 +18,7 @@ except Exception as e:
     print("WARNING: Secret not found. You will need to configure `dbutils.secrets`.")
     API_TOKEN = "<fallback-or-empty-if-testing>"
 
-BASE_URL = "https://runalyze.com/api/v1/activities"
+BASE_URL = "https://runalyze.com/api/v1/activity"
 BRONZE_TABLE_NAME = "runalyze_bronze"
 
 # COMMAND ----------
