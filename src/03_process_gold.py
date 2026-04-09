@@ -25,7 +25,7 @@ df_weekly_mileage = df_with_week.groupBy("run_week") \
                                      count("id").alias("run_count")) \
                                 .orderBy("run_week")
 
-df_weekly_mileage.write.format("delta").mode("overwrite").saveAsTable("gold_weekly_mileage")
+df_weekly_mileage.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("gold_weekly_mileage")
 
 # COMMAND ----------
 # 2. Time in HR Zones (Estimates using averages)
@@ -52,7 +52,7 @@ df_hr_summary = df_hr_zones.groupBy("dominant_hr_zone") \
                            .count() \
                            .withColumnRenamed("count", "total_runs_in_zone")
 
-df_hr_summary.write.format("delta").mode("overwrite").saveAsTable("gold_hr_zones")
+df_hr_summary.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("gold_hr_zones")
 
 # COMMAND ----------
 # 3. Average Weekly Pace
@@ -79,6 +79,6 @@ df_weekly_pace = df_weekly_pace.withColumn(
  .select("run_week", "avg_pace_minutes_per_km", "friendly_pace") \
  .orderBy("run_week")
 
-df_weekly_pace.write.format("delta").mode("overwrite").saveAsTable("gold_weekly_pace")
+df_weekly_pace.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("gold_weekly_pace")
 
 print("Successfully refreshed all Gold Datamarts!")
