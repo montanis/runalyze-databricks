@@ -14,30 +14,24 @@ resources:
         - task_key: ingest_bronze
           notebook_task:
             notebook_path: ./src/01_ingest_runalyze.py
-          job_cluster_key: shared_cluster
+          serverless_compute:
+            num_workers: 1
 
         - task_key: process_silver
           depends_on:
             - task_key: ingest_bronze
           notebook_task:
             notebook_path: ./src/02_process_silver.py
-          job_cluster_key: shared_cluster
+          serverless_compute:
+            num_workers: 1
           
         - task_key: process_gold
           depends_on:
             - task_key: process_silver
           notebook_task:
             notebook_path: ./src/03_process_gold.py
-          job_cluster_key: shared_cluster
-
-      job_clusters:
-        - job_cluster_key: shared_cluster
-          new_cluster:
-            spark_version: "14.3.x-scala2.12"
-            node_type_id: "Standard_DS3_v2" # Note: modify based on your cloud provider.
+          serverless_compute:
             num_workers: 1
-            spark_env_vars:
-              PYSPARK_PYTHON: /databricks/python3/bin/python3
 
 targets:
   prod:
