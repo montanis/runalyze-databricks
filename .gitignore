@@ -1,1 +1,3 @@
 databricks
+.databricks/
+.DS_Store
