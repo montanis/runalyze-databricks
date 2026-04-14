@@ -21,5 +21,7 @@ jobs:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: |
-          databricks bundle destroy --target prod --auto-approve || true
+          echo "Destroying existing deployment..."
+          databricks bundle destroy --target prod --auto-approve || echo "No existing deployment to destroy"
+          echo "Deploying fresh bundle..."
           databricks bundle deploy --target prod
